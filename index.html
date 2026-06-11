@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>18-Minute Repeating Countdown</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        width: 100%;
+        min-height: 100vh;
+        padding: 20px;
+        background: #f5f5f5;
+        color: #222;
+    }
+
+    #logo {
+        width: min(90vw, 300px);
+        height: auto;
+        display: block;
+        margin: 0 auto 20px;
+    }
+
+    h1 {
+        font-size: clamp(1.5rem, 5vw, 3rem);
+        margin-bottom: 20px;
+    }
+
+    #timer {
+        font-size: clamp(3rem, 18vw, 8rem);
+        font-weight: bold;
+        margin: 20px 0;
+        width: 100%;
+        color: #0077cc;
+    }
+
+    #cycleCount {
+        font-size: clamp(1rem, 3vw, 1.5rem);
+        margin-bottom: 20px;
+    }
+
+    #resetBtn {
+        padding: 12px 24px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 8px;
+        background: #cc0000;
+        color: white;
+        cursor: pointer;
+        margin-bottom: 30px;
+        transition: background 0.2s ease;
+    }
+
+    #resetBtn:hover {
+        background: #aa0000;
+    }
+
+    h2 {
+        font-size: clamp(1.2rem, 4vw, 2rem);
+        margin-bottom: 15px;
+    }
+
+    #logContainer {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+        text-align: left;
+    }
+
+    #log {
+        list-style-type: none;
+        width: 100%;
+    }
+
+    #log li {
+        background: white;
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        word-break: break-word;
+    }
+
+    @media (max-width: 600px) {
+        body {
+            padding: 15px;
+        }
+
+        #log li {
+            padding: 10px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<!-- Place Ramsay_Logo.jpg in the same folder as this HTML file -->
+<img src="Ramsay_Logo.jpg" alt="Logo" id="logo">
+
+<h1>18-Minute Repeating Countdown</h1>
+
+<div id="timer">18:00</div>
+
+<div id="cycleCount">
+    Completed Cycles: 0
+</div>
+
+<button id="resetBtn">Reset</button>
+
+<div id="logContainer">
+    <h2>Cycle Log</h2>
+    <ul id="log"></ul>
+</div>
+
+<script>
+const CYCLE_SECONDS = 18 * 60;
+
+let remainingSeconds = CYCLE_SECONDS;
+let completedCycles = 0;
+
+const timerEl = document.getElementById("timer");
+const cycleCountEl = document.getElementById("cycleCount");
+const logEl = document.getElementById("log");
+const resetBtn = document.getElementById("resetBtn");
+
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+
+    return (
+        String(mins).padStart(2, "0") +
+        ":" +
+        String(secs).padStart(2, "0")
+    );
+}
+
+function recordCycle() {
+    completedCycles++;
+
+    cycleCountEl.textContent =
+        `Completed Cycles: ${completedCycles}`;
+
+    const li = document.createElement("li");
+
+    li.textContent =
+        `Cycle ${completedCycles} completed at ${new Date().toLocaleString()}`;
+
+    // Add newest cycle at the top
+    logEl.prepend(li);
+}
+
+function resetTimer() {
+    remainingSeconds = CYCLE_SECONDS;
+    completedCycles = 0;
+
+    timerEl.textContent = formatTime(remainingSeconds);
+    cycleCountEl.textContent = "Completed Cycles: 0";
+
+    // Clear log entries
+    logEl.innerHTML = "";
+}
+
+resetBtn.addEventListener("click", () => {
+    if (confirm("Reset timer and clear cycle log?")) {
+        resetTimer();
+    }
+});
+
+function updateTimer() {
+    timerEl.textContent = formatTime(remainingSeconds);
+
+    if (remainingSeconds === 0) {
+        recordCycle();
+
+        // Restart at 18 minutes
+        remainingSeconds = CYCLE_SECONDS;
+    } else {
+        remainingSeconds--;
+    }
+}
+
+// Initial display
+timerEl.textContent = formatTime(remainingSeconds);
+
+// Update every second
+setInterval(updateTimer, 1000);
+</script>
+
+</body>
+</html>
