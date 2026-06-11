@@ -121,7 +121,7 @@
 </div>
 
 <script>
-const CYCLE_SECONDS = 18 * 60;
+const CYCLE_SECONDS = 14 * 60;
 
 let remainingSeconds = CYCLE_SECONDS;
 let completedCycles = 0;
@@ -168,11 +168,7 @@ function resetTimer() {
     logEl.innerHTML = "";
 }
 
-resetBtn.addEventListener("click", () => {
-    if (confirm("Reset timer and clear cycle log?")) {
-        resetTimer();
-    }
-});
+resetBtn.addEventListener("click", resetTimer);
 
 function updateTimer() {
     timerEl.textContent = formatTime(remainingSeconds);
@@ -180,7 +176,7 @@ function updateTimer() {
     if (remainingSeconds === 0) {
         recordCycle();
 
-        // Restart at 18 minutes
+        // Restart at X minutes
         remainingSeconds = CYCLE_SECONDS;
     } else {
         remainingSeconds--;
