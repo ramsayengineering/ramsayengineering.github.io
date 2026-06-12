@@ -34,33 +34,66 @@
         margin-bottom: 20px;
     }
 
-#timer {
-    font-size: clamp(6rem, 35vw, 18rem);
-    font-weight: bold;
-    line-height: 1;
-    margin: 20px 0;
-    width: 100%;
-    color: black;
-}
+    #timer {
+        font-size: clamp(6rem, 35vw, 18rem);
+        font-weight: bold;
+        line-height: 1;
+        margin: 20px 0;
+        width: 100%;
+        color: black;
+    }
 
     #cycleCount {
         font-size: clamp(1rem, 3vw, 1.5rem);
         margin-bottom: 20px;
     }
 
-    #resetBtn {
+    #controls {
+        margin-bottom: 15px;
+    }
+
+    #controls button,
+    #resetLogBtn {
         padding: 12px 24px;
         font-size: 1rem;
         border: none;
         border-radius: 8px;
-        background: #cc0000;
         color: white;
         cursor: pointer;
-        margin-bottom: 30px;
+        margin: 5px;
         transition: background 0.2s ease;
     }
 
-    #resetBtn:hover {
+    #startBtn {
+        background: #008000;
+    }
+
+    #startBtn:hover {
+        background: #006600;
+    }
+
+    #pauseBtn {
+        background: #ff9900;
+    }
+
+    #pauseBtn:hover {
+        background: #cc7a00;
+    }
+
+    #resetTimerBtn {
+        background: #0066cc;
+    }
+
+    #resetTimerBtn:hover {
+        background: #004d99;
+    }
+
+    #resetLogBtn {
+        background: #cc0000;
+        margin-bottom: 30px;
+    }
+
+    #resetLogBtn:hover {
         background: #aa0000;
     }
 
@@ -103,7 +136,6 @@
 </head>
 <body>
 
-<!-- Place Ramsay_Logo.jpg in the same folder as this HTML file -->
 <img src="Ramsay_Logo.jpg" alt="Logo" id="logo">
 
 <h1>Ecoating Cycle</h1>
@@ -114,7 +146,13 @@
     Completed Cycles: 0
 </div>
 
-<button id="resetBtn">Reset</button>
+<div id="controls">
+    <button id="startBtn">Start</button>
+    <button id="pauseBtn">Pause</button>
+    <button id="resetTimerBtn">Reset Timer</button>
+</div>
+
+<button id="resetLogBtn">Reset Cycle Log</button>
 
 <div id="logContainer">
     <h2>Cycle Log</h2>
@@ -126,11 +164,17 @@ const CYCLE_SECONDS = 14 * 60;
 
 let remainingSeconds = CYCLE_SECONDS;
 let completedCycles = 0;
+let timerRunning = false;
+let intervalId = null;
 
 const timerEl = document.getElementById("timer");
 const cycleCountEl = document.getElementById("cycleCount");
 const logEl = document.getElementById("log");
-const resetBtn = document.getElementById("resetBtn");
+
+const startBtn = document.getElementById("startBtn");
+const pauseBtn = document.getElementById("pauseBtn");
+const resetTimerBtn = document.getElementById("resetTimerBtn");
+const resetLogBtn = document.getElementById("resetLogBtn");
 
 function formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
@@ -154,41 +198,54 @@ function recordCycle() {
     li.textContent =
         `Cycle ${completedCycles} completed at ${new Date().toLocaleString()}`;
 
-    // Add newest cycle at the top
     logEl.prepend(li);
 }
 
 function resetTimer() {
     remainingSeconds = CYCLE_SECONDS;
-    completedCycles = 0;
-
     timerEl.textContent = formatTime(remainingSeconds);
-    cycleCountEl.textContent = "Completed Cycles: 0";
-
-    // Clear log entries
-    logEl.innerHTML = "";
 }
 
-resetBtn.addEventListener("click", resetTimer);
+function resetCycleLog() {
+    completedCycles = 0;
+
+    cycleCountEl.textContent =
+        "Completed Cycles: 0";
+
+    logEl.innerHTML = "";
+}
 
 function updateTimer() {
     timerEl.textContent = formatTime(remainingSeconds);
 
     if (remainingSeconds === 0) {
         recordCycle();
-
-        // Restart at X minutes
         remainingSeconds = CYCLE_SECONDS;
     } else {
         remainingSeconds--;
     }
 }
 
+function startTimer() {
+    if (timerRunning) return;
+
+    timerRunning = true;
+
+    intervalId = setInterval(updateTimer, 1000);
+}
+
+function pauseTimer() {
+    timerRunning = false;
+    clearInterval(intervalId);
+}
+
+startBtn.addEventListener("click", startTimer);
+pauseBtn.addEventListener("click", pauseTimer);
+resetTimerBtn.addEventListener("click", resetTimer);
+resetLogBtn.addEventListener("click", resetCycleLog);
+
 // Initial display
 timerEl.textContent = formatTime(remainingSeconds);
-
-// Update every second
-setInterval(updateTimer, 1000);
 </script>
 
 </body>
